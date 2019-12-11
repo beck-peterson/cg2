@@ -135,7 +135,7 @@ public class BoardController : MonoBehaviour
     private void PreviewBoard()
     {
         GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        board.AddComponent<Panel>().init(0, programContents[currentProgram]);
+        board.AddComponent<Panel>().init(0, programContents[currentProgram], false);
         Panel panel = board.GetComponent(typeof(Panel)) as Panel;
         board.transform.parent = gameObject.transform;
     }
@@ -174,7 +174,7 @@ public class BoardController : MonoBehaviour
         int product = 1;
         int i = 1;
         GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        board.AddComponent<Panel>().init(depth, new string[] { "int FactorialIterative(number = " + number + ") {", "\tint product = " + product + ";", "\tint i = " + i + ";", "\tfor (i = 1; i < number; i++) {", "\t\tproduct = product * i;", "\t}", "\treturn product;", "}" });
+        board.AddComponent<Panel>().init(depth, new string[] { "int FactorialIterative(number = " + number + ") {", "\tint product = " + product + ";", "\tint i = " + i + ";", "\tfor (i = 1; i < number; i++) {", "\t\tproduct = product * i;", "\t}", "\treturn product;", "}" }, true);
         Panel panel = board.GetComponent(typeof(Panel)) as Panel;
         board.transform.parent = gameObject.transform;
         yield return new WaitForSeconds(pauseTime);
@@ -230,7 +230,7 @@ public class BoardController : MonoBehaviour
     private IEnumerator FactorialRecursive(int number, int depth)
     {
         GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        board.AddComponent<Panel>().init(depth, new string[] { "int FactorialRecursive(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint smallerFactorial = Factorial(number - 1);", "\t\treturn number * smallerFactorial;", "\t}", "}" });
+        board.AddComponent<Panel>().init(depth, new string[] { "int FactorialRecursive(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint smallerFactorial = Factorial(number - 1);", "\t\treturn number * smallerFactorial;", "\t}", "}" }, true);
         Panel panel = board.GetComponent(typeof(Panel)) as Panel;
         board.transform.parent = gameObject.transform;
         yield return new WaitForSeconds(pauseTime);
@@ -291,7 +291,7 @@ public class BoardController : MonoBehaviour
         int b = 1;
         int i = 0;
         GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        board.AddComponent<Panel>().init(depth, new string[] { "int FibonacciIterative(number = " + number + ") {", "\tint a = " + a + ";", "\tint b = " + b + ";", "\tint i = " + i + ";", "\tfor (i = 0; i < number; i++) {", "\t\tint temp = a;", "\t\ta = b;", "\t\tb = temp + b;", "\t}", "\treturn a;", "}" });
+        board.AddComponent<Panel>().init(depth, new string[] { "int FibonacciIterative(number = " + number + ") {", "\tint a = " + a + ";", "\tint b = " + b + ";", "\tint i = " + i + ";", "\tfor (i = 0; i < number; i++) {", "\t\tint temp = a;", "\t\ta = b;", "\t\tb = temp + b;", "\t}", "\treturn a;", "}" }, true);
         Panel panel = board.GetComponent(typeof(Panel)) as Panel;
         board.transform.parent = gameObject.transform;
         yield return new WaitForSeconds(pauseTime);
@@ -360,7 +360,7 @@ public class BoardController : MonoBehaviour
 
     private IEnumerator FibonacciRecursive(int number, int depth) {
         GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        board.AddComponent<Panel>().init(depth, new string[] { "int FibonacciRecursive(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = FibonacciRecursive(number - 2);", "\t\tint last = FibonacciRecursive(number - 1);", "\t\treturn secondToLast + last;", "\t}", "}" });
+        board.AddComponent<Panel>().init(depth, new string[] { "int FibonacciRecursive(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = FibonacciRecursive(number - 2);", "\t\tint last = FibonacciRecursive(number - 1);", "\t\treturn secondToLast + last;", "\t}", "}" }, true);
         Panel panel = board.GetComponent(typeof(Panel)) as Panel;
         board.transform.parent = gameObject.transform;
         yield return new WaitForSeconds(pauseTime);
@@ -397,7 +397,7 @@ public class Panel : MonoBehaviour
     public GameObject pointer;
     public GameObject[] lines = new GameObject[20];
 
-    public void init(int stack, string[] code)
+    public void init(int stack, string[] code, Boolean showPointer)
     {
         GameObject board = gameObject;
         board.name = "Board";
@@ -405,13 +405,16 @@ public class Panel : MonoBehaviour
         board.transform.localRotation = Quaternion.Euler(0f, -60f, 0f);
         board.transform.localScale = new Vector3(1f, 9 / 16f, 0.02f);
 
-        pointer = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        pointer.name = "Pointer";
-        pointer.transform.parent = board.transform;
-        pointer.transform.localPosition = new Vector3(0f, 0.391f, -0.001f);
-        pointer.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-        pointer.transform.localScale = new Vector3(1.0001f, 0.045f, 1f);
-        pointer.GetComponent<Renderer>().material.color = new Color32(255, 159, 0, 255);
+        if (showPointer)
+        {
+            pointer = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            pointer.name = "Pointer";
+            pointer.transform.parent = board.transform;
+            pointer.transform.localPosition = new Vector3(0f, 0.391f, -0.001f);
+            pointer.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            pointer.transform.localScale = new Vector3(1.0001f, 0.045f, 1f);
+            pointer.GetComponent<Renderer>().material.color = new Color32(255, 159, 0, 255);
+        }
 
         for (int i = 0; i < lines.Length && i < code.Length; i++)
         {

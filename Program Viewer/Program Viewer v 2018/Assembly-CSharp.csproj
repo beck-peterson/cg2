@@ -340,7 +340,6 @@
      <Compile Include="Assets\Oculus\Spatializer\scripts\ONSPVersion.cs" />
      <Compile Include="Assets\Scripts\BoardController.cs" />
      <Compile Include="Assets\Scripts\ControllerButton.cs" />
-     <Compile Include="Assets\Scripts\Events.cs" />
      <Compile Include="Assets\Scripts\InterfaceController.cs" />
      <Compile Include="Assets\Scripts\LessButton.cs" />
      <Compile Include="Assets\Scripts\MoreButton.cs" />

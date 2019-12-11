@@ -30,10 +30,10 @@ give an idea for the execution when run.
 ** How to run **
 The program was developed using a first generation version of the Oculus Rift with hand controllers. Additionally, the
 system specs on the computer this was developed on were an i7-6700k cpu and GTX 1070 gpu operating under Windows 10,
-though these factors should not play a role. At the time this was written, the execution has been through the Unity
-editor running version 2018.4.11f1. The system should be plug and play such that having a connected Oculus rift that is
-set up with sensors and hand controllers is sufficient to get the program to run through the headset and behave
-properly.
+though these factors should not play a role. This can either be run from the executable, or from the source code
+through the Unity editor running version 2018.4.11f1. The system should be plug and play such that having a connected
+Oculus rift that is set up with sensors and hand controllers is sufficient to get the program to run through the
+headset and behave properly.
 
 ** Things that didn't make it in **
 Unfortunately, like all good projects, this one attempted to shoot further than it could reach. Originally, a stretch
