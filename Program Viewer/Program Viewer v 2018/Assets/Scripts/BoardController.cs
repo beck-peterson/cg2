@@ -10,6 +10,11 @@ using TMPro;
 public class BoardController : MonoBehaviour
 {
     public string[] programList = { "Factorial Iterative", "Factorial Recursive", "Fibonacci Iterative", "Fibonacci Recursive" };
+    public string[][] programContents = {
+        new string[] { "int FactorialIterative(number) {", "\tint product = 1;", "\tint i = 1;", "\tfor (i = 1; i < number; i++) {", "\t\tproduct = product * i;", "\t}", "\treturn product;", "}" },
+        new string[] { "int FactorialRecursive(number) {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint smallerFactorial = Factorial(number - 1);", "\t\treturn number * smallerFactorial;", "\t}", "}" },
+        new string[] { "int FibonacciIterative(number) {", "\tint a = 1;", "\tint b = 1;", "\tint i = 0;", "\tfor (i = 0; i < number; i++) {", "\t\tint temp = a;", "\t\ta = b;", "\t\tb = temp + b;", "\t}", "\treturn a;", "}" },
+        new string[] { "int FibonacciRecursive(number) {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = FibonacciRecursive(number - 2);", "\t\tint last = FibonacciRecursive(number - 1);", "\t\treturn secondToLast + last;", "\t}", "}" } };
     public int currentProgram = 0;
     public int input = 7;
     public string output = "";
@@ -18,7 +23,7 @@ public class BoardController : MonoBehaviour
 
     void Start()
     {
-
+        PreviewBoard();
     }
 
     void Update()
@@ -40,6 +45,7 @@ public class BoardController : MonoBehaviour
     public void StopButton()
     {
         CleanUpProgram();
+        PreviewBoard();
     }
 
     public void MoreButton()
@@ -100,6 +106,7 @@ public class BoardController : MonoBehaviour
 
     private void StartProgram()
     {
+        CleanUpProgram();
         switch (programList[currentProgram])
         {
             case "Factorial Iterative":
@@ -122,6 +129,15 @@ public class BoardController : MonoBehaviour
     {
         CleanUpProgram();
         currentProgram = (currentProgram + 1) % programList.Length;
+        PreviewBoard();
+    }
+
+    private void PreviewBoard()
+    {
+        GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        board.AddComponent<Panel>().init(0, programContents[currentProgram]);
+        Panel panel = board.GetComponent(typeof(Panel)) as Panel;
+        board.transform.parent = gameObject.transform;
     }
 
     //////////
@@ -141,7 +157,6 @@ public class BoardController : MonoBehaviour
 
     private void FactorialIterative(int number)
     {
-        CleanUpProgram();
         StartCoroutine(FactorialIterativeHelper(number));
     }
 
@@ -151,6 +166,7 @@ public class BoardController : MonoBehaviour
         yield return cd.coroutine;
         output = "" + cd.result;
         programRunning = false;
+        PreviewBoard();
     }
 
     private IEnumerator FactorialIterative(int number, int depth)
@@ -199,7 +215,6 @@ public class BoardController : MonoBehaviour
 
     private void FactorialRecursive(int number)
     {
-        CleanUpProgram();
         StartCoroutine(FactorialRecursiveHelper(number));
     }
 
@@ -209,6 +224,7 @@ public class BoardController : MonoBehaviour
         yield return cd.coroutine;
         output = "" + cd.result;
         programRunning = false;
+        PreviewBoard();
     }
 
     private IEnumerator FactorialRecursive(int number, int depth)
@@ -257,7 +273,6 @@ public class BoardController : MonoBehaviour
 
         private void FibonacciIterative(int number)
     {
-        CleanUpProgram();
         StartCoroutine(FibonacciIterativeHelper(number));
     }
 
@@ -267,6 +282,7 @@ public class BoardController : MonoBehaviour
         yield return cd.coroutine;
         output = "" + cd.result;
         programRunning = false;
+        PreviewBoard();
     }
 
     private IEnumerator FibonacciIterative(int number, int depth)
@@ -330,7 +346,6 @@ public class BoardController : MonoBehaviour
 
     private void FibonacciRecursive(int number)
     {
-        CleanUpProgram();
         StartCoroutine(FibonacciRecursiveHelper(number));
     }
 
@@ -340,6 +355,7 @@ public class BoardController : MonoBehaviour
         yield return cd.coroutine;
         output = "" + cd.result;
         programRunning = false;
+        PreviewBoard();
     }
 
     private IEnumerator FibonacciRecursive(int number, int depth) {
