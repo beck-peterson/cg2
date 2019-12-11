@@ -9,12 +9,12 @@ using TMPro;
 
 public class BoardController : MonoBehaviour
 {
-    public string[] code = { "int Fibonacci(int number) {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = Fibonacci(number - 2);", "\t\tint last = Fibonacci(number - 1);", "\t\treturn secondToLast + last;", "\t}", "}" };
-    public string[] programList = { "Fibonacci", "Greatest Common Factor" };
+    public string[] programList = { "Factorial Iterative", "Factorial Recursive", "Fibonacci Iterative", "Fibonacci Recursive" };
     public int currentProgram = 0;
     public int input = 7;
     public string output = "";
     public Boolean programRunning = false;
+    private float pauseTime = 1f;
 
     void Start()
     {
@@ -26,7 +26,44 @@ public class BoardController : MonoBehaviour
 
     }
 
-    public void MorePressed()
+    //////////
+    //
+    // These functions are renamed to make rebinding the buttons to the functions easier when I need to re bind everything when unity fails to load the script
+    //
+    //////////
+
+    public void StartButton()
+    {
+        StartProgram();
+    }
+
+    public void StopButton()
+    {
+        CleanUpProgram();
+    }
+
+    public void MoreButton()
+    {
+        MorePressed();
+    }
+
+    public void LessButton()
+    {
+        LessPressed();
+    }
+
+    public void NextProgramButton()
+    {
+        NextProgram();
+    }
+
+    //////////
+    //
+    // Private functions
+    //
+    //////////
+
+    private void MorePressed()
     {
         if (programRunning)
         {
@@ -34,11 +71,11 @@ public class BoardController : MonoBehaviour
         }
         else
         {
-            input++;
+            if (input < 10) input++;
         }
     }
 
-    public void LessPressed()
+    private void LessPressed()
     {
         if (programRunning)
         {
@@ -46,11 +83,11 @@ public class BoardController : MonoBehaviour
         }
         else
         {
-            input--;
+            if (input > 1) input--;
         }
     }
 
-    public void CleanUpProgram()
+    private void CleanUpProgram()
     {
         StopAllCoroutines();
         foreach (Transform child in transform)
@@ -61,39 +98,225 @@ public class BoardController : MonoBehaviour
         programRunning = false;
     }
 
-    public void StartProgram()
+    private void StartProgram()
     {
         switch (programList[currentProgram])
         {
-            case "Fibonacci":
-                Fibonacci(input);
+            case "Factorial Iterative":
+                FactorialIterative(input);
                 break;
-            case "Greatest Common Factor":
+            case "Factorial Recursive":
+                FactorialRecursive(input);
+                break;
+            case "Fibonacci Iterative":
+                FibonacciIterative(input);
+                break;
+            case "Fibonacci Recursive":
+                FibonacciRecursive(input);
                 break;
         }
         programRunning = true;
     }
-    
-    public void NextProgram()
+
+    private void NextProgram()
     {
         CleanUpProgram();
         currentProgram = (currentProgram + 1) % programList.Length;
-        Debug.Log(programList[currentProgram] + " " + currentProgram + " " + programList.Length + " " + programList + " " + programList[1]);
     }
 
-    void Fibonacci(int number)
+    //////////
+    //
+    // Factorial Iterative
+    //
+    //////////
+
+    //int Factorial(int number) {
+    //    int product = 1;
+    //    int i = 1;
+    //    for (i = 1; i < number; i++) {
+    //        product = product * i;
+    //    }
+    //    return product;
+    //}
+
+    private void FactorialIterative(int number)
     {
         CleanUpProgram();
-        StartCoroutine(FibonacciHelper(number));
+        StartCoroutine(FactorialIterativeHelper(number));
     }
 
-    IEnumerator FibonacciHelper(int number)
+    private IEnumerator FactorialIterativeHelper(int number)
     {
-        CoroutineWithData cd = new CoroutineWithData(this, Fibonacci(number, 0));
+        CoroutineWithData cd = new CoroutineWithData(this, FactorialIterative(number, 0));
         yield return cd.coroutine;
         output = "" + cd.result;
         programRunning = false;
     }
+
+    private IEnumerator FactorialIterative(int number, int depth)
+    {
+        int product = 1;
+        int i = 1;
+        GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        board.AddComponent<Panel>().init(depth, new string[] { "int FactorialIterative(number = " + number + ") {", "\tint product = " + product + ";", "\tint i = " + i + ";", "\tfor (i = 1; i < number; i++) {", "\t\tproduct = product * i;", "\t}", "\treturn product;", "}" });
+        Panel panel = board.GetComponent(typeof(Panel)) as Panel;
+        board.transform.parent = gameObject.transform;
+        yield return new WaitForSeconds(pauseTime);
+        panel.nextLine(1);
+        yield return new WaitForSeconds(pauseTime);
+        panel.nextLine(1);
+        yield return new WaitForSeconds(pauseTime);
+        for (i = 1; i < number; i++) {
+            panel.nextLine(1);
+            yield return new WaitForSeconds(pauseTime);
+            product = product * i;
+            panel.updateCode(new string[] { "int FactorialIterative(number = " + number + ") {", "\tint product = " + product + ";", "\tint i = " + i + ";", "\tfor (i = 1; i < number; i++) {", "\t\tproduct = " + product + ";", "\t}", "\treturn product;", "}" });
+            yield return new WaitForSeconds(pauseTime);
+            panel.nextLine(-1);
+            panel.updateCode(new string[] { "int FactorialIterative(number = " + number + ") {", "\tint product = " + product + ";", "\tint i = " + (i + 1) + ";", "\tfor (i = 1; i < number; i++) {", "\t\tproduct = product * i;", "\t}", "\treturn product;", "}" });
+            yield return new WaitForSeconds(pauseTime);
+        }
+        panel.nextLine(3);
+        yield return new WaitForSeconds(pauseTime);
+        Destroy(board);
+        yield return product;
+    }
+
+    //////////
+    //
+    // Factorial Recursive
+    //
+    //////////
+
+    //int Factorial(int number) {
+    //    if (number <= 1) {
+    //        return 1;
+    //    } else {
+    //        int smallerFactorial = Factorial(number - 1);
+    //        return number * smallerFactorial;
+    //    }
+    //}
+
+    private void FactorialRecursive(int number)
+    {
+        CleanUpProgram();
+        StartCoroutine(FactorialRecursiveHelper(number));
+    }
+
+    private IEnumerator FactorialRecursiveHelper(int number)
+    {
+        CoroutineWithData cd = new CoroutineWithData(this, FactorialRecursive(number, 0));
+        yield return cd.coroutine;
+        output = "" + cd.result;
+        programRunning = false;
+    }
+
+    private IEnumerator FactorialRecursive(int number, int depth)
+    {
+        GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        board.AddComponent<Panel>().init(depth, new string[] { "int FactorialRecursive(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint smallerFactorial = Factorial(number - 1);", "\t\treturn number * smallerFactorial;", "\t}", "}" });
+        Panel panel = board.GetComponent(typeof(Panel)) as Panel;
+        board.transform.parent = gameObject.transform;
+        yield return new WaitForSeconds(pauseTime);
+        if (number <= 1) {
+            panel.nextLine(1);
+            yield return new WaitForSeconds(pauseTime);
+            Destroy(board);
+            yield return 1;
+        } else {
+            panel.nextLine(3);
+            yield return new WaitForSeconds(pauseTime);
+            CoroutineWithData cd = new CoroutineWithData(this, FactorialRecursive(number - 1, depth + 1));
+            yield return cd.coroutine;
+            int smallerFactorial = (int) cd.result;
+            panel.updateCode(new string[] { "int FactorialRecursive(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint smallerFactorial = " + smallerFactorial + ";", "\t\treturn number * smallerFactorial;", "\t}", "}" });
+            yield return new WaitForSeconds(pauseTime);
+            panel.nextLine(1);
+            yield return new WaitForSeconds(pauseTime);
+            Destroy(board);
+            yield return number * smallerFactorial;
+        }
+    }
+
+    //////////
+    //
+    // Fibonacci Iterative
+    //
+    //////////
+
+    //int Fibonacci(int number) {
+    //    int a = 0;
+    //    int b = 1;
+    //    for (int i = 0; i < number; i++) {
+    //        int temp = a;
+    //        a = b;
+    //        b = temp + b;
+    //    }
+    //    return a;
+    //}
+
+        private void FibonacciIterative(int number)
+    {
+        CleanUpProgram();
+        StartCoroutine(FibonacciIterativeHelper(number));
+    }
+
+    private IEnumerator FibonacciIterativeHelper(int number)
+    {
+        CoroutineWithData cd = new CoroutineWithData(this, FibonacciIterative(number, 0));
+        yield return cd.coroutine;
+        output = "" + cd.result;
+        programRunning = false;
+    }
+
+    private IEnumerator FibonacciIterative(int number, int depth)
+    {
+        int a = 1;
+        int b = 1;
+        int i = 0;
+        GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        board.AddComponent<Panel>().init(depth, new string[] { "int FibonacciIterative(number = " + number + ") {", "\tint a = " + a + ";", "\tint b = " + b + ";", "\tint i = " + i + ";", "\tfor (i = 0; i < number; i++) {", "\t\tint temp = a;", "\t\ta = b;", "\t\tb = temp + b;", "\t}", "\treturn a;", "}" });
+        Panel panel = board.GetComponent(typeof(Panel)) as Panel;
+        board.transform.parent = gameObject.transform;
+        yield return new WaitForSeconds(pauseTime);
+        panel.nextLine(1);
+        yield return new WaitForSeconds(pauseTime);
+        panel.nextLine(1);
+        yield return new WaitForSeconds(pauseTime);
+        panel.nextLine(1);
+        yield return new WaitForSeconds(pauseTime);
+        for (i = 0; i < number; i++)
+        {
+            panel.nextLine(1);
+            yield return new WaitForSeconds(pauseTime);
+            int temp = a;
+            panel.updateCode(new string[] { "int FibonacciIterative(number = " + number + ") {", "\tint a = " + a + ";", "\tint b = " + b + ";", "\tint i = " + i + ";", "\tfor (i = 0; i < number; i++) {", "\t\tint temp = " + temp + ";", "\t\ta = b;", "\t\tb = temp + b;", "\t}", "\treturn a;", "}" });
+            yield return new WaitForSeconds(pauseTime);
+            panel.nextLine(1);
+            yield return new WaitForSeconds(pauseTime);
+            a = b;
+            panel.updateCode(new string[] { "int FibonacciIterative(number = " + number + ") {", "\tint a = " + a + ";", "\tint b = " + b + ";", "\tint i = " + i + ";", "\tfor (i = 0; i < number; i++) {", "\t\tint temp = " + temp + ";", "\t\ta = " + a + ";", "\t\tb = temp + b;", "\t}", "\treturn a;", "}" });
+            yield return new WaitForSeconds(pauseTime);
+            panel.nextLine(1);
+            yield return new WaitForSeconds(pauseTime);
+            b = temp + b;
+            panel.updateCode(new string[] { "int FibonacciIterative(number = " + number + ") {", "\tint a = " + a + ";", "\tint b = " + b + ";", "\tint i = " + i + ";", "\tfor (i = 0; i < number; i++) {", "\t\tint temp = " + temp + ";", "\t\ta = " + a + ";", "\t\tb = " + b + ";", "\t}", "\treturn a;", "}" });
+            yield return new WaitForSeconds(pauseTime);
+            panel.nextLine(-3);
+            panel.updateCode(new string[] { "int FibonacciIterative(number = " + number + ") {", "\tint a = " + a + ";", "\tint b = " + b + ";", "\tint i = " + (i + 1) + ";", "\tfor (i = 0; i < number; i++) {", "\t\tint temp = a;", "\t\ta = b;", "\t\tb = temp + b;", "\t}", "\treturn a;", "}" });
+            yield return new WaitForSeconds(pauseTime);
+        }
+        panel.nextLine(5);
+        yield return new WaitForSeconds(pauseTime);
+        Destroy(board);
+        yield return a;
+    }
+
+    //////////
+    //
+    // Fibonacci Recursive
+    //
+    //////////
 
     //int Fibonacci(int number) {
     //    if (number <= 1) {
@@ -105,13 +328,25 @@ public class BoardController : MonoBehaviour
     //    }
     //}
 
-    float pauseTime = 1f;
-    IEnumerator Fibonacci(int number, int depth) {
+    private void FibonacciRecursive(int number)
+    {
+        CleanUpProgram();
+        StartCoroutine(FibonacciRecursiveHelper(number));
+    }
+
+    private IEnumerator FibonacciRecursiveHelper(int number)
+    {
+        CoroutineWithData cd = new CoroutineWithData(this, FibonacciRecursive(number, 0));
+        yield return cd.coroutine;
+        output = "" + cd.result;
+        programRunning = false;
+    }
+
+    private IEnumerator FibonacciRecursive(int number, int depth) {
         GameObject board = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        board.AddComponent<Panel>().init(depth, code);
+        board.AddComponent<Panel>().init(depth, new string[] { "int FibonacciRecursive(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = FibonacciRecursive(number - 2);", "\t\tint last = FibonacciRecursive(number - 1);", "\t\treturn secondToLast + last;", "\t}", "}" });
         Panel panel = board.GetComponent(typeof(Panel)) as Panel;
         board.transform.parent = gameObject.transform;
-        panel.updateCode(new string[] { "int Fibonacci(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = Fibonacci(number - 2);", "\t\tint last = Fibonacci(number - 1);", "\t\treturn secondToLast + last;", "\t}", "}" });
         yield return new WaitForSeconds(pauseTime);
         if (number <= 1) {
             panel.nextLine(1);
@@ -121,17 +356,17 @@ public class BoardController : MonoBehaviour
         } else {
             panel.nextLine(3);
             yield return new WaitForSeconds(pauseTime);
-            CoroutineWithData cd = new CoroutineWithData(this, Fibonacci(number - 2, depth + 1));
+            CoroutineWithData cd = new CoroutineWithData(this, FibonacciRecursive(number - 2, depth + 1));
             yield return cd.coroutine;
             int secondToLast = (int) cd.result;
-            panel.updateCode(new string[] { "int Fibonacci(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = " + secondToLast + ";", "\t\tint last = Fibonacci(number - 1);", "\t\treturn secondToLast + last;", "\t}", "}" });
+            panel.updateCode(new string[] { "int FibonacciRecursive(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = " + secondToLast + ";", "\t\tint last = FibonacciRecursive(number - 1);", "\t\treturn secondToLast + last;", "\t}", "}" });
             yield return new WaitForSeconds(pauseTime);
             panel.nextLine(1);
             yield return new WaitForSeconds(pauseTime);
-            cd = new CoroutineWithData(this, Fibonacci(number - 1, depth + 1));
+            cd = new CoroutineWithData(this, FibonacciRecursive(number - 1, depth + 1));
             yield return cd.coroutine;
             int last = (int) cd.result;
-            panel.updateCode(new string[] { "int Fibonacci(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = " + secondToLast + ";", "\t\tint last = " + last + ";", "\t\treturn secondToLast + last;", "\t}", "}" });
+            panel.updateCode(new string[] { "int FibonacciRecursive(number = " + number + ") {", "\tif (number <= 1) {", "\t\treturn 1;", "\t} else {", "\t\tint secondToLast = " + secondToLast + ";", "\t\tint last = " + last + ";", "\t\treturn secondToLast + last;", "\t}", "}" });
             yield return new WaitForSeconds(pauseTime);
             panel.nextLine(1);
             yield return new WaitForSeconds(pauseTime);
