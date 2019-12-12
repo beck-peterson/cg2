@@ -33,7 +33,7 @@ system specs on the computer this was developed on were an i7-6700k cpu and GTX 
 though these factors should not play a role. This can either be run from the executable, or from the source code
 through the Unity editor running version 2018.4.11f1. The system should be plug and play such that having a connected
 Oculus rift that is set up with sensors and hand controllers is sufficient to get the program to run through the
-headset and behave properly.
+headset and behave properly. This also includes having the Oculus software running on your computer.
 
 ** Things that didn't make it in **
 Unfortunately, like all good projects, this one attempted to shoot further than it could reach. Originally, a stretch
